@@ -73,28 +73,33 @@ public final class ConvincingOldPVP extends JavaPlugin implements Listener {
 
         if (event.getDamager() instanceof Player player) {
 
+            // code in this method is from a guy on github which I spent time searching for and couldn't find, I refactored some of it and I'm pretty sure it was unlicensed anyway.
+            // If you are the owner of this code and want it taken down or just want credit please make an issue I will definetely respond.
             ItemStack item = player.getInventory().getItemInMainHand();
             Map<Enchantment, Integer> enchantments = item.getEnchantments();
             LivingEntity entity = (LivingEntity) event.getEntity();
 
             double rawDamage = getRawDamage(item);
 
-            if (enchantments.get(Enchantment.DAMAGE_ARTHROPODS) != null)
+            if (enchantments.get(Enchantment.DAMAGE_ARTHROPODS) != null) {
                 if (enchantments.get(Enchantment.DAMAGE_ARTHROPODS) > 0
                         && entity.getCategory().equals(EntityCategory.ARTHROPOD)) {
                     rawDamage += (2.5 * enchantments.get(Enchantment.DAMAGE_ARTHROPODS));
                 }
+            }
 
-            if (enchantments.get(Enchantment.DAMAGE_UNDEAD) != null)
+            if (enchantments.get(Enchantment.DAMAGE_UNDEAD) != null) {
                 if (enchantments.get(Enchantment.DAMAGE_UNDEAD) > 0
                         && entity.getCategory().equals(EntityCategory.UNDEAD)) {
                     rawDamage += (2.5 * enchantments.get(Enchantment.DAMAGE_UNDEAD));
                 }
+            }
 
-            if (enchantments.get(Enchantment.DAMAGE_ALL) != null)
+            if (enchantments.get(Enchantment.DAMAGE_ALL) != null) {
                 if (enchantments.get(Enchantment.DAMAGE_ALL) > 0) {
                     rawDamage += (1.25 * enchantments.get(Enchantment.DAMAGE_ALL));
                 }
+            }
 
             if (checkCrit(player)) {
                 rawDamage *= 1.5;
@@ -110,9 +115,8 @@ public final class ConvincingOldPVP extends JavaPlugin implements Listener {
 
     public double getRawDamage(ItemStack item) {
         Material material = item.getType();
-        double rawDamage;
+        double rawDamage = 1; // fist
         switch (material) {
-            default -> rawDamage = 1; // fist
             case NETHERITE_SWORD -> rawDamage = 8;
             case DIAMOND_SWORD, TRIDENT, NETHERITE_AXE -> rawDamage = 7;
             case IRON_SWORD, NETHERITE_PICKAXE, NETHERITE_SHOVEL, DIAMOND_AXE -> rawDamage = 6;
@@ -133,18 +137,17 @@ public final class ConvincingOldPVP extends JavaPlugin implements Listener {
      */
     public boolean checkCrit(@NotNull Player player) {
         Material blockMaterial = player.getLocation().getWorld().getBlockAt(player.getLocation()).getType();
-        ArrayList<Material> blackList = new ArrayList<>() {
-            {
-                add(Material.WATER);
-                add(Material.LADDER);
-                add(Material.VINE);
-                add(Material.CAVE_VINES);
-                add(Material.GLOW_LICHEN);
-                add(Material.TWISTING_VINES);
-                add(Material.WEEPING_VINES);
-            }
-        };
+        List<Material> blackList = List.of(
+                Material.WATER,
+                Material.LADDER,
+                Material.VINE,
+                Material.CAVE_VINES,
+                Material.GLOW_LICHEN,
+                Material.TWISTING_VINES,
+                Material.WEEPING_VINES
+        );
 
+        // this is vulnerable as it is just client side
         return (!player.isOnGround() && !blackList.contains(blockMaterial) && player.getFallDistance() != 0
                 && !player.isSprinting() && !player.hasPotionEffect(PotionEffectType.BLINDNESS));
     }
