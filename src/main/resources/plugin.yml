@@ -1,0 +1,6 @@
+name: ConvincingOldPVP
+version: '${version}'
+main: io.github.adomasdauda.ConvincingOldPVP
+api-version: 1.19
+depend: [ ProtocolLib ]
+authors: [ AdomasDauda ]
