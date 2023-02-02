@@ -6,6 +6,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -34,25 +35,40 @@ public final class ConvincingOldPVP extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
 
         final ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+
         manager.addPacketListener(
-                new PacketAdapter(this, PacketType.Play.Server.NAMED_SOUND_EFFECT) {
+                new PacketAdapter(this, PacketType.Play.Server.WORLD_PARTICLES) {
                     @Override
                     public void onPacketSending(PacketEvent event) {
-
-                        List<Sound> blockedSounds = List.of(
-                                Sound.ENTITY_PLAYER_ATTACK_CRIT,
-                                Sound.ENTITY_PLAYER_ATTACK_STRONG,
-                                Sound.ENTITY_PLAYER_ATTACK_SWEEP,
-                                Sound.ENTITY_PLAYER_ATTACK_WEAK,
-                                Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK,
-                                Sound.ENTITY_PLAYER_ATTACK_NODAMAGE
-                        );
-
-                        if (blockedSounds.contains(event.getPacket().getSoundEffects().getValues().get(0))) {
+                        Particle particle = event.getPacket().getNewParticles().read(0).getParticle();
+                        if (particle.equals(Particle.SWEEP_ATTACK)
+                                || particle.equals(Particle.DAMAGE_INDICATOR)) {
                             event.setCancelled(true);
                         }
                     }
                 }
+        );
+
+
+        manager.addPacketListener(
+            new PacketAdapter(this, PacketType.Play.Server.NAMED_SOUND_EFFECT) {
+                @Override
+                public void onPacketSending(PacketEvent event) {
+
+                    List<Sound> blockedSounds = List.of(
+                            Sound.ENTITY_PLAYER_ATTACK_CRIT,
+                            Sound.ENTITY_PLAYER_ATTACK_STRONG,
+                            Sound.ENTITY_PLAYER_ATTACK_SWEEP,
+                            Sound.ENTITY_PLAYER_ATTACK_WEAK,
+                            Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK,
+                            Sound.ENTITY_PLAYER_ATTACK_NODAMAGE
+                    );
+
+                    if (blockedSounds.contains(event.getPacket().getSoundEffects().getValues().get(0))) {
+                        event.setCancelled(true);
+                    }
+                }
+            }
         );
 
     }
