@@ -80,7 +80,7 @@ public final class ConvincingOldPVP extends JavaPlugin implements Listener {
         // md5 :kiss:
         AttributeInstance attackAttribute = event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED);
         if (attackAttribute != null) {
-            attackAttribute.setBaseValue(100);
+            attackAttribute.setBaseValue(16);
         }
     }
 
